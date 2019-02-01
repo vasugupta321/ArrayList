@@ -1,2 +1,2 @@
 # ArrayList
-Two versions of implementing ArrayList in Java as well as a Java program implementing LinkedList 
+Two versions of implementing lists in Java. One is using an ArrayList and the other using a LinkedList
