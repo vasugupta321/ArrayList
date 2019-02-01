@@ -1,2 +1,2 @@
 # ArrayList
-A java program implementing some features for an ArrayList
+Two versions of implementing ArrayList in Java as well as a Java program implementing LinkedList 
