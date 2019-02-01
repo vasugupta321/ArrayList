@@ -1,293 +1,187 @@
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
-public class A1LinkedList <E> implements List <E>{
-	transient int size = 0;
-	transient Node<E> first;
-	transient Node<E> last;
 	
-	public A1LinkedList() {
-    }
-	
-    private static class Node<E> {
-        E item;
-        Node<E> next;
-        Node<E> prev;
+/**
+ * @author Vasu Gupta
+ * Course: EECS 2011
+ * Date: June 19, 2017
+ * Description: Implementing a generic doubly linked list, similar to the LinkedList method by Java 
+ * 
+ * @param <E> - E represents the type of element in the doubly linked list
+ */
 
-        Node(Node<E> prev, E element, Node<E> next) {
-            this.item = element;
-            this.next = next;
-            this.prev = prev;
-        }
-    }
+public class A1LinkedList<E> {
 
-	@Override
+	private Node<E> head = new Node<>(null);
+	private Node<E> tail = new Node<> (null);
+	private int size = 0;
+
+	/** 
+	 * private inner class used for main class. 
+	 * Private so accessible by members of given class
+	 */
+
+	private static class Node<E> {
+		private E data;
+		private Node<E> next;
+		private Node<E> prev;
+
+		public Node(E elements) {
+			data = elements;
+		}
+	}
+
+	/**
+	 * Constructor: Creates an empty doubly linked list.
+	 */
+
+	public A1LinkedList()
+	{
+		size = 0;
+		head.next = tail;
+		tail.prev = head;
+		head.prev = null; 
+		tail.next = null; 
+	}
+
+	/**
+	 * @param element - The element to add at the end of the linked list.
+	 * 
+	 * Inserts the specified element to the end of the list.
+	 */
+
 	public boolean add(E e) {
-        final Node<E> oldLast = last;
-        final Node<E> newNode = new Node<>(oldLast, e, null);
-        last = newNode;
-        if (oldLast == null)
-            first = newNode;
-        else
-            oldLast.next = newNode;
-        size++;
+		if(e == null){
+			throw new NullPointerException("e is null");
+		}
+		Node<E> n = new Node<>(e);
+		n.prev = tail.prev;
+		n.next = tail;
+		tail.prev.next = n;
+		tail.prev = n;
+		size++;
 		return true;
 	}
 
-	@Override
-	public void add(int index, E element) {
-		if (!(index >= 0 && index <= size))
-			throw new IndexOutOfBoundsException("Index: "+index+", Size: "+size);
-		
-        if (index == size){ //to insert into the last position
-            final Node<E> oldLast = last;
-            final Node<E> newNode = new Node<>(oldLast, element, null);
-            last = newNode;
-            if (oldLast == null)
-                first = newNode;
-            else
-                oldLast.next = newNode;
-            size++;
+	/**
+	 * @param index - The index at which specified element is to be inserted
+	 * @param element - element to be inserted
+	 * 
+	 * Inserts the specified element at the specific index told in the linked list.
+	 * Shifts whatever element is currently at that index (if any) and subsequent elements to the right.
+	 * So it adds one to their indices.
+	 * If index is out of range, it throws IndexOutOfBoundsException. 
+	 */
 
-        }
-        else{ //non-last position
-        	Node<E> x; 
-        	if (index < size/2)
-    		{
-    			x = first;
-    			for (int i = 0; i < index; i++)
-    				x = x.next; //add before this node
-    		}else{
-    			x = last;
-    			for (int i = size - 1; i > index; i--)
-    				x = x.prev; //add before this node
-    		}
-            
-            final Node<E> predecessor = x.prev;
-            final Node<E> newNode = new Node<>(predecessor, element, x);
-            x.prev = newNode;
-            if (predecessor == null)
-                first = newNode;
-            else
-                predecessor.next = newNode;
-            size++;
-        }
-	}
-
-	@Override
-	public void clear() {
-		//optional nulling
-        for (Node<E> x = first; x != null; ) {
-            Node<E> next = x.next;
-            x.item = null;
-            x.next = null;
-            x.prev = null;
-            x = next;
-        }
-        
-        first = last = null;
-        size = 0;
-	}
-
-	@Override
-	public boolean remove(Object o) {
-        if (o == null) {
-            for (Node<E> x = first; x != null; x = x.next) {
-                if (x.item == null) {
-                    final Node<E> next = x.next;
-                    final Node<E> prev = x.prev;
-
-                    if (prev == null) { //if first node
-                        first = next;
-                    } else {
-                        prev.next = next;
-                        x.prev = null;
-                    }
-
-                    if (next == null) { //if last node
-                        last = prev;
-                    } else {
-                        next.prev = prev;
-                        x.next = null;
-                    }
-
-                    x.item = null;
-                    size--;
-                    return true;
-                }
-            }
-        } else {
-            for (Node<E> x = first; x != null; x = x.next) {
-                if (o.equals(x.item)) {
-                    final Node<E> next = x.next;
-                    final Node<E> prev = x.prev;
-
-                    if (prev == null) { //if remove the first
-                        first = next;
-                    } else {
-                        prev.next = next;
-                        x.prev = null;
-                    }
-
-                    if (next == null) { //if remove the last
-                        last = prev;
-                    } else {
-                        next.prev = prev;
-                        x.next = null;
-                    }
-
-                    x.item = null;
-                    size--;
-                    return true;
-                }
-            }
-        }
-        return false;
-	}
-
-	@Override
-	public E remove(int index) {
-		if (!(index >= 0 && index <= size))
-			throw new IndexOutOfBoundsException("Index: "+index+", Size: "+size);
-		
-		Node<E> x;
-		if (index < size/2)
-		{
-			x = first;
-			for (int i = 0; i < index; i++)
-				x = x.next; //remove this node
-		}else{
-			x = last;
-			for (int i = size - 1; i > index; i--)
-				x = x.prev; //remove this node
+	public void add(int index, E elements) throws IndexOutOfBoundsException{
+		if(index < 0 || index > size)
+			throw new IndexOutOfBoundsException("index is out of bounds " + index);
+		Node<E> temp;
+		int counter;
+		if(index > size/2){
+			counter = size;
+			temp = tail;
+			while(--counter >= index)
+				temp = temp.prev;
 		}
-			
-        final E element = x.item; //will return it at the end
-        final Node<E> next = x.next;
-        final Node<E> prev = x.prev;
-
-        if (prev == null) { //remove the first
-            first = next;
-        } else {
-            prev.next = next;
-            x.prev = null;
-        }
-
-        if (next == null) { //remove the last
-            last = prev;
-        } else {
-            next.prev = prev;
-            x.next = null;
-        }
-
-        x.item = null;
-        size--;
-        return element;
+		else{
+			counter = -1;
+			temp = head;
+			while(++counter <= index){
+				temp = temp.next;
+			}
+		}
+		Node<E> temp2 = new Node<>(elements);
+		temp2.next = temp;
+		temp.prev.next = temp2;
+		temp2.prev = temp.prev;
+		temp.prev = temp2;
+		size++;
 	}
-	
-	@Override
-	public int size() {
+
+	/**
+	 * Removes every element from this list.
+	 */
+
+	public void clear(){
+		head.next = tail;
+		tail.prev = head;
+		size = 0;
+	}
+
+	/**
+	 * @param index - The specified index to be removed from the list
+	 * 
+	 * Removes and returns the element at the specified index.
+	 * Shifts any subsequent elements to the left by subtracting one from their indices.
+	 * 
+	 * @return - the element previously at specified index
+	 * 
+	 * Throws IndexOutOfBoundsException if index is out of range.
+	 */
+
+	public E remove(int index) throws IndexOutOfBoundsException{
+		if(index < 0 || index >= size )
+			throw new IndexOutOfBoundsException("index is out of bounds " + index);
+		Node<E> temp;
+		int counter;
+		if(index > size/2){
+			counter = size;
+			temp = tail;
+			while(--counter >= index)
+				temp = temp.prev;
+		}
+		else{
+			counter = -1;
+			temp = head;
+			while(++counter <= index){
+				temp = temp.next;
+			}
+		}
+		E temp2 = temp.data;
+		temp.next.prev = temp.prev;
+		temp.prev.next = temp.next;
+		size--;
+		return temp2;
+	}
+
+	/**
+	 * @param o - the object to be removed from the list
+	 * 
+	 * Removes the first occurrence of the specified element from this list, if the element is present
+	 * 
+	 * @return - true if list contains specified element 
+	 */
+
+	public boolean remove(Object o){
+		Node<E> temp = head;
+		while(temp.next != null){
+			temp = temp.next;
+			if(temp.data.equals(o)){
+				temp.next.prev = temp.prev;
+				temp.prev.next = temp.next;
+				size--;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @return - the number of elements in this list
+	 */
+
+	public int size(){
 		return size;
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-        sb.append('[');
-        
-        for (Node <E> element  = first; element != null; element = element.next){
-            sb.append(element.item == this ? "(this Collection)" : element.item);
-            if (element.next == null) return sb.append(']').toString();
-            sb.append(',').append(' ');
-        }
-        return null;
+	public String toString()
+	{
+		String s = "[";
+		for(int i=0; i<this.size; i++)
+		{
+			s = s + s.indexOf(0, size - 1);
+		}
+		s = s + "]";
+		return s;
 	}
-
-	@Override
-	public boolean addAll(Collection<? extends E> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean addAll(int index, Collection<? extends E> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean contains(Object o) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public E get(int index) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int indexOf(Object o) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Iterator<E> iterator() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int lastIndexOf(Object o) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public ListIterator<E> listIterator() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public ListIterator<E> listIterator(int index) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public E set(int index, E element) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public List<E> subList(int fromIndex, int toIndex) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Object[] toArray() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public <T> T[] toArray(T[] a) {
-		throw new UnsupportedOperationException();
-	}
-
 }
