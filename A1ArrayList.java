@@ -2,7 +2,6 @@ import java.util.Arrays;
 
 /**
  * @author Vasu Gupta
- * Course: EECS 2011
  * Date: June 19, 2017
  * Description: Implementing a generic array list, similar to the ArrayList method by Java 
  * 
