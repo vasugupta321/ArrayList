@@ -2,7 +2,6 @@ import java.util.Arrays;
 
 /**
  * @author Vasu Gupta
- * Date: June 19, 2017
  * Description: Implementing a generic array list, similar to the ArrayList method by Java 
  * 
  * @param <E> - E represents the type of element to be in the doubly linked list
