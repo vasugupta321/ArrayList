@@ -1,8 +1,6 @@
 	
 /**
  * @author Vasu Gupta
- * Course: EECS 2011
- * Date: June 19, 2017
  * Description: Implementing a generic doubly linked list, similar to the LinkedList method by Java 
  * 
  * @param <E> - E represents the type of element in the doubly linked list
